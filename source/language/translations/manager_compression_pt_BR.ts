@@ -132,6 +132,22 @@
         <translation>Concluídas</translation>
     </message>
     <message>
+        <source>🔴 Concluídas</source>
+        <translation>🔴 Concluídas</translation>
+    </message>
+    <message>
+        <source>🟠 Concluídas</source>
+        <translation>🟠 Concluídas</translation>
+    </message>
+    <message>
+        <source>🟡 Concluídas</source>
+        <translation>🟡 Concluídas</translation>
+    </message>
+    <message>
+        <source>🟢 Concluídas</source>
+        <translation>🟢 Concluídas</translation>
+    </message>
+    <message>
         <source>Nenhuma Tarefa Concluída</source>
         <translation>Nenhuma Tarefa Concluída</translation>
     </message>
@@ -432,44 +448,188 @@
         <translation>Mostrar prioridade</translation>
     </message>
     <message>
-      <source>Deseja remover as tarefas selecionadas?</source>
-      <translation>Deseja remover as tarefas selecionadas?</translation>
+        <source>Deseja remover as tarefas selecionadas?</source>
+        <translation>Deseja remover as tarefas selecionadas?</translation>
     </message>
     <message>
-      <source>Prioridade:</source>
-      <translation>Prioridade:</translation>
+        <source>Prioridade:</source>
+        <translation>Prioridade:</translation>
     </message>
     <message>
-      <source>Não foi possível remover todas as tarefas selecionadas.</source>
-      <translation>Não foi possível remover todas as tarefas selecionadas.</translation>
+        <source>Não foi possível remover todas as tarefas selecionadas.</source>
+        <translation>Não foi possível remover todas as tarefas selecionadas.</translation>
     </message>
     <message>
-      <source>Tarefa(s) removida(s) com sucesso.</source>
-      <translation>Tarefa(s) removida(s) com sucesso.</translation>
+        <source>Tarefa(s) removida(s) com sucesso.</source>
+        <translation>Tarefa(s) removida(s) com sucesso.</translation>
     </message>
     <message>
-      <source>Tarefa removida com sucesso.</source>
-      <translation>Tarefa removida com sucesso.</translation>
+        <source>Tarefa removida com sucesso.</source>
+        <translation>Tarefa removida com sucesso.</translation>
     </message>
     <message>
-      <source>Não foi possível remover a tarefa selecionada.</source>
-      <translation>Não foi possível remover a tarefa selecionada.</translation>
+        <source>Não foi possível remover a tarefa selecionada.</source>
+        <translation>Não foi possível remover a tarefa selecionada.</translation>
     </message>
     <message>
-      <source>Nenhuma tarefa válida foi selecionada.</source>
-      <translation>Nenhuma tarefa válida foi selecionada.</translation>
+        <source>Nenhuma tarefa válida foi selecionada.</source>
+        <translation>Nenhuma tarefa válida foi selecionada.</translation>
     </message>
     <message>
-      <source>Remoção cancelada.</source>
-      <translation>Remoção cancelada.</translation>
+        <source>Remoção cancelada.</source>
+        <translation>Remoção cancelada.</translation>
     </message>
     <message>
-      <source>Não foi possível remover todas as tarefas deste dia.</source>
-      <translation>Não foi possível remover todas as tarefas deste dia.</translation>
+        <source>Não foi possível remover todas as tarefas deste dia.</source>
+        <translation>Não foi possível remover todas as tarefas deste dia.</translation>
     </message>
     <message>
-      <source>Tarefa não encontrada.</source>
-      <translation>Tarefa não encontrada.</translation>
+        <source>Tarefa não encontrada.</source>
+        <translation>Tarefa não encontrada.</translation>
+    </message>
+    <message>
+        <source>Calendário Anual/Calendário Mensal</source>
+        <translation>Calendário Anual/Calendário Mensal</translation>
+    </message>
+    <message>
+        <source>Calendário Mensal</source>
+        <translation>Calendário Mensal</translation>
+    </message>
+    <message>
+        <source>Calendário Anual</source>
+        <translation>Calendário Anual</translation>
+    </message>
+    <message>
+        <source>Visualização atual: calendário anual. Clique para calendário mensal.</source>
+        <translation>Visualização atual: calendário anual. Clique para calendário mensal.</translation>
+    </message>
+    <message>
+        <source>Visualização atual: calendário mensal. Clique para calendário anual.</source>
+        <translation>Visualização atual: calendário mensal. Clique para calendário anual.</translation>
+    </message>
+    <message>
+        <source>Ano</source>
+        <translation>Ano</translation>
+    </message>
+    <message>
+        <source>(Sem título)</source>
+        <translation>(Sem título)</translation>
+    </message>
+    <message>
+        <source>Deseja remover todas as tarefas deste mês?</source>
+        <translation>Deseja remover todas as tarefas deste mês?</translation>
+    </message>
+    <message>
+        <source>Algumas tarefas não puderam ser removidas.</source>
+        <translation>Algumas tarefas não puderam ser removidas.</translation>
+    </message>
+    <message>
+        <source>Não foi possível remover as tarefas deste mês.</source>
+        <translation>Não foi possível remover as tarefas deste mês.</translation>
+    </message>
+    <message>
+        <source>Ajuda - Atalhos</source>
+        <translation>Ajuda - Atalhos</translation>
+    </message>
+    <message>
+        <source>Atalhos de Teclado</source>
+        <translation>Atalhos de Teclado</translation>
+    </message>
+    <message>
+        <source>Lista completa de atalhos implementados no código:</source>
+        <translation>Lista completa de atalhos implementados no código:</translation>
+    </message>
+    <message>
+        <source>Atalhos de menu</source>
+        <translation>Atalhos de menu</translation>
+    </message>
+    <message>
+        <source>Atalho</source>
+        <translation>Atalho</translation>
+    </message>
+    <message>
+        <source>Atalhos</source>
+        <translation>Atalhos</translation>
+    </message>
+    <message>
+        <source>Ação</source>
+        <translation>Ação</translation>
+    </message>
+    <message>
+        <source>Atalhos globais</source>
+        <translation>Atalhos globais</translation>
+    </message>
+    <message>
+        <source>Abrir menu Arquivo</source>
+        <translation>Abrir menu Arquivo</translation>
+    </message>
+    <message>
+        <source>Abrir menu Idioma</source>
+        <translation>Abrir menu Idioma</translation>
+    </message>
+    <message>
+        <source>Abrir menu Opções</source>
+        <translation>Abrir menu Opções</translation>
+    </message>
+    <message>
+        <source>Nenhum atalho de menu encontrado.</source>
+        <translation>Nenhum atalho de menu encontrado.</translation>
+    </message>
+    <message>
+        <source>Nenhum atalho global encontrado.</source>
+        <translation>Nenhum atalho global encontrado.</translation>
+    </message>
+    <message>
+        <source>Sucesso</source>
+        <translation>Sucesso</translation>
+    </message>
+    <message>
+        <source>Idioma "{language}" aplicado com sucesso!</source>
+        <translation>Idioma "{language}" aplicado com sucesso!</translation>
+    </message>
+    <message>
+        <source>Não foi possível aplicar o Idioma "{language}"!</source>
+        <translation>Não foi possível aplicar o Idioma "{language}"!</translation>
+    </message>
+    <message>
+        <source>Não foi possível mover a tarefa "{item}"!</source>
+        <translation>Não foi possível mover a tarefa "{item}"!</translation>
+    </message>
+    <message>
+        <source>Tarefa "{item}" movida com sucesso!</source>
+        <translation>Tarefa "{item}" movida com sucesso!</translation>
+    </message>
+    <message>
+        <source>Mover tarefa</source>
+        <translation>Mover tarefa</translation>
+    </message>
+    <message>
+        <source>Selecione o quadrante:</source>
+        <translation>Selecione o quadrante:</translation>
+    </message>
+    <message>
+        <source>Tarefa</source>
+        <translation>Tarefa</translation>
+    </message>
+    <message>
+        <source>Não foi possível mover a tarefa "{items}"!</source>
+        <translation>Não foi possível mover a tarefa "{items}"!</translation>
+    </message>
+    <message>
+        <source>Não foi possível mover as tarefas "{items}"!</source>
+        <translation>Não foi possível mover as tarefas "{items}"!</translation>
+    </message>
+    <message>
+        <source>Tarefa "{items}" movida com sucesso!</source>
+        <translation>Tarefa "{items}" movida com sucesso!</translation>
+    </message>
+    <message>
+        <source>Tarefas "{items}" movidas com sucesso!</source>
+        <translation>Tarefas "{items}" movidas com sucesso!</translation>
+    </message>
+    <message>
+        <source>Não foi possível remover as tarefas selecionadas.</source>
+        <translation>Não foi possível remover as tarefas selecionadas.</translation>
     </message>
 </context>
 </TS>

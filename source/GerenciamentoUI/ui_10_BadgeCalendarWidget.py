@@ -13,6 +13,11 @@ class BadgeCalendarWidget(QCalendarWidget):
             self._task_counts_by_week = {}  # {week_number: count}
             self._task_counts_by_month = {}  # {(year, month): count}
             self._tasks_by_date = {}  # {date_iso_str: [lines]}
+            self._tasks_by_date_data = {}  # {date_iso_str: [task dicts]}
+
+            self._task_counts = self._task_counts_by_date
+            self._week_counts = self._task_counts_by_week
+            self._month_counts = self._task_counts_by_month
 
         except Exception as e:
             logger.error(f"Erro ao inicializar BadgeCalendarWidget: {e}", exc_info=True)
@@ -30,6 +35,13 @@ class BadgeCalendarWidget(QCalendarWidget):
         except Exception as e:
             logger.error(f"Erro ao definir mapa de tooltip do calendário: {e}", exc_info=True)
 
+    def set_tasks_by_date_data(self, tasks_by_date_data: dict):
+        try:
+            self._tasks_by_date_data = tasks_by_date_data or {}
+
+        except Exception as e:
+            logger.error(f"Erro ao definir mapa de dados do calendário: {e}", exc_info=True)
+
     def set_task_counts(self, task_dates_iso):
         try:
             self._task_counts_by_date.clear()
@@ -38,6 +50,7 @@ class BadgeCalendarWidget(QCalendarWidget):
 
             for date_str in task_dates_iso:
                 qdate = QDate.fromString(date_str, Qt.ISODate)
+
                 if not qdate.isValid():
                     continue
 
@@ -48,6 +61,10 @@ class BadgeCalendarWidget(QCalendarWidget):
 
                 month_key = (qdate.year(), qdate.month())
                 self._task_counts_by_month[month_key] = self._task_counts_by_month.get(month_key, 0) + 1
+
+            self._task_counts = self._task_counts_by_date
+            self._week_counts = self._task_counts_by_week
+            self._month_counts = self._task_counts_by_month
 
             self.updateCells()
 
@@ -118,13 +135,16 @@ class BadgeCalendarWidget(QCalendarWidget):
                     pass
 
             view = self.findChild(QAbstractItemView)
+
             if view is not None:
                 vpos = view.mapFrom(self, pos)
                 idx = view.indexAt(vpos)
+
                 if idx.isValid():
                     for role in (Qt.UserRole, Qt.UserRole + 1, Qt.UserRole + 2, Qt.DisplayRole):
                         try:
                             val = idx.data(role)
+
                             if isinstance(val, QDate) and val.isValid():
                                 return val
 
@@ -134,8 +154,10 @@ class BadgeCalendarWidget(QCalendarWidget):
                     try:
                         day_val = idx.data(Qt.DisplayRole)
                         day = int(day_val)
+
                         if day > 0:
                             qd = QDate(self.yearShown(), self.monthShown(), day)
+
                             if qd.isValid():
                                 return qd
 
@@ -152,9 +174,11 @@ class BadgeCalendarWidget(QCalendarWidget):
             if event.type() == QEvent.ToolTip:
                 pos = event.position().toPoint() if hasattr(event, "position") else event.pos()
                 qd = self._date_at_pos(pos)
+
                 if qd and qd.isValid():
                     ds = qd.toString(Qt.ISODate)
                     lines = self._tasks_by_date.get(ds) or []
+
                     if lines:
                         QToolTip.showText(event.globalPos(), "\n".join(lines), self)
                         return True

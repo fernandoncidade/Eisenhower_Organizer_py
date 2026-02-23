@@ -26,10 +26,10 @@ def atualizar_textos(app):
         app.quadrant3_label.setText(get_text("🟡 Não Importante, mas Urgente"))
         app.quadrant4_label.setText(get_text("🟢 Não Importante e Não Urgente"))
 
-        app.quadrant1_completed_label.setText(get_text("Concluídas"))
-        app.quadrant2_completed_label.setText(get_text("Concluídas"))
-        app.quadrant3_completed_label.setText(get_text("Concluídas"))
-        app.quadrant4_completed_label.setText(get_text("Concluídas"))
+        app.quadrant1_completed_label.setText(get_text("🔴 Concluídas"))
+        app.quadrant2_completed_label.setText(get_text("🟠 Concluídas"))
+        app.quadrant3_completed_label.setText(get_text("🟡 Concluídas"))
+        app.quadrant4_completed_label.setText(get_text("🟢 Concluídas"))
 
         if hasattr(app, "quadrant_tabs") and app.quadrant_tabs is not None:
             app.quadrant_tabs.setTabText(0, get_text("🔴 Importante e Urgente"))

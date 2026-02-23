@@ -1,6 +1,8 @@
 import sys
 import re
+from datetime import date
 from pathlib import Path
+from typing import Optional
 
 # garante que a raiz do projeto esteja no sys.path quando o script for executado diretamente
 # (resolve o erro "ModuleNotFoundError: No module named 'source'")
@@ -19,6 +21,8 @@ logger = LogManager.get_logger()
 BASE_DIR = Path(__file__).resolve().parent.parent  # usar a raiz do projeto (um nível acima de tools)
 
 FILES_REL = {
+    "readme_pt": Path("README.md"),
+    "readme_en": Path("README.md"),
     "privacy_pt": Path("source") / "assets" / "PRIVACY_POLICY" / "Privacy_Policy_pt_BR.txt",
     "privacy_en": Path("source") / "assets" / "PRIVACY_POLICY" / "Privacy_Policy_en_US.txt",
     "notice_pt": Path("source") / "assets" / "NOTICES" / "NOTICE_pt_BR.txt",
@@ -121,6 +125,14 @@ def read_file(path: Path):
 
 # padrões para extrair o que realmente está nos arquivos (não comparar com EXPECTED)
 PATTERNS = {
+    "readme_pt": [
+        r'^(> \*\*Observação:\*\*.*)$',
+        r'^(Versão:\s*v[\d\.]+)\s*$',
+    ],
+    "readme_en": [
+        r'^(> \*\*Note:\*\*.*)$',
+        r'^(Version:\s*v[\d\.]+)\s*$',
+    ],
     "privacy_pt": [
         r'^(Versão:\s*.*)$',
         r'^(Última atualização:\s*.*)$'
@@ -205,6 +217,21 @@ def replace_file_content(path: Path, new_text: str):
     except Exception as e:
         return False, str(e)
 
+def build_version_from_date(d: Optional[date] = None) -> str:
+    try:
+        base = d or date.today()
+        return f"{base.year}.{base.month}.{base.day}.0"
+
+    except Exception:
+        return "2025.11.26.0"
+
+def readme_version_token(version: str) -> str:
+    v = str(version or "").strip()
+    if not v:
+        return "v0.0.0.0"
+
+    return v if v.lower().startswith("v") else f"v{v}"
+
 def apply_updates(pt_version, pt_day, pt_month_index, pt_year, en_version, en_day, en_month_index, en_year, base_dir: Path = BASE_DIR):
     results = []
     files = get_files_for_base(base_dir)
@@ -212,6 +239,8 @@ def apply_updates(pt_version, pt_day, pt_month_index, pt_year, en_version, en_da
     pt_date = f"{pt_day} de {pt_month_name} de {pt_year}"
     en_month_name = EN_MONTHS[en_month_index]
     en_date = f"{en_month_name} {en_day}, {en_year}"
+    pt_readme_version = readme_version_token(pt_version)
+    en_readme_version = readme_version_token(en_version)
 
     for key, path in files.items():
         txt = read_file(path)
@@ -223,7 +252,35 @@ def apply_updates(pt_version, pt_day, pt_month_index, pt_year, en_version, en_da
         new_txt = txt
 
         try:
-            if key == "privacy_pt":
+            if key == "readme_pt":
+                new_txt = re.sub(
+                    r'^(\> \*\*Observação:\*\* Este repositório refere-se à versão \*\*)v[\d\.]+(\*\* do Projeto EISENHOWER ORGANIZER\..*)$',
+                    rf'\1{pt_readme_version}\2',
+                    new_txt,
+                    flags=re.MULTILINE
+                )
+                new_txt = re.sub(
+                    r'^(Versão:\s*)v[\d\.]+$',
+                    rf'\1{pt_readme_version}',
+                    new_txt,
+                    flags=re.MULTILINE
+                )
+
+            elif key == "readme_en":
+                new_txt = re.sub(
+                    r'^(\> \*\*Note:\*\* This repository refers to the \*\*)v[\d\.]+(\*\* version of the EISENHOWER ORGANIZER Project\..*)$',
+                    rf'\1{en_readme_version}\2',
+                    new_txt,
+                    flags=re.MULTILINE
+                )
+                new_txt = re.sub(
+                    r'^(Version:\s*)v[\d\.]+$',
+                    rf'\1{en_readme_version}',
+                    new_txt,
+                    flags=re.MULTILINE
+                )
+
+            elif key == "privacy_pt":
                 new_txt = re.sub(r'^(Versão:\s*).*$',lambda m: m.group(1) + pt_version, new_txt, flags=re.MULTILINE)
                 new_txt = re.sub(r'^(Última atualização:\s*).*$',lambda m: m.group(1) + pt_date, new_txt, flags=re.MULTILINE)
 
@@ -273,6 +330,11 @@ class VersionEditor(QWidget):
         super().__init__()
         self.setWindowTitle("Editor de Versões / Datas - Lúmen (PT/EN)")
         self.resize(820, 520)
+        today = date.today()
+        default_version = build_version_from_date(today)
+        default_day = int(today.day)
+        default_month_index = int(today.month) - 1
+        default_year = int(today.year)
 
         try:
             icon_path = get_icon_path("autismo.ico")
@@ -304,25 +366,25 @@ class VersionEditor(QWidget):
         pt_group.setLayout(pt_layout)
 
         pt_layout.addWidget(QLabel("Versão:"))
-        self.pt_version = QLineEdit("2025.11.26.0")
+        self.pt_version = QLineEdit(default_version)
         pt_layout.addWidget(self.pt_version)
 
         pt_layout.addWidget(QLabel("Dia:"))
         self.pt_day = QSpinBox()
         self.pt_day.setRange(1, 31)
-        self.pt_day.setValue(26)
+        self.pt_day.setValue(default_day)
         pt_layout.addWidget(self.pt_day)
 
         pt_layout.addWidget(QLabel("Mês:"))
         self.pt_month = QComboBox()
         self.pt_month.addItems(PT_MONTHS)
-        self.pt_month.setCurrentIndex(10)  # Novembro
+        self.pt_month.setCurrentIndex(default_month_index)
         pt_layout.addWidget(self.pt_month)
 
         pt_layout.addWidget(QLabel("Ano:"))
         self.pt_year = QSpinBox()
         self.pt_year.setRange(1900, 3000)
-        self.pt_year.setValue(2025)
+        self.pt_year.setValue(default_year)
         pt_layout.addWidget(self.pt_year)
 
         layout.addWidget(pt_group)
@@ -333,25 +395,25 @@ class VersionEditor(QWidget):
         en_group.setLayout(en_layout)
 
         en_layout.addWidget(QLabel("Version:"))
-        self.en_version = QLineEdit("2025.11.26.0")
+        self.en_version = QLineEdit(default_version)
         en_layout.addWidget(self.en_version)
 
         en_layout.addWidget(QLabel("Day:"))
         self.en_day = QSpinBox()
         self.en_day.setRange(1, 31)
-        self.en_day.setValue(26)
+        self.en_day.setValue(default_day)
         en_layout.addWidget(self.en_day)
 
         en_layout.addWidget(QLabel("Month:"))
         self.en_month = QComboBox()
         self.en_month.addItems(EN_MONTHS)
-        self.en_month.setCurrentIndex(10)  # November
+        self.en_month.setCurrentIndex(default_month_index)
         en_layout.addWidget(self.en_month)
 
         en_layout.addWidget(QLabel("Year:"))
         self.en_year = QSpinBox()
         self.en_year.setRange(1900, 3000)
-        self.en_year.setValue(2025)
+        self.en_year.setValue(default_year)
         en_layout.addWidget(self.en_year)
 
         layout.addWidget(en_group)

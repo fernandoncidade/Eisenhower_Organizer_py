@@ -1,3 +1,33 @@
+NOTAS DE LANÇAMENTO: Versão 0.2.0.0
+Data: 22 de fevereiro de 2026
+
+Principais novidades:
+- Novo calendário anual integrado, com visão dos 12 meses e contagem de tarefas por mês.
+- Novo filtro por Ano na lista global, além dos filtros por Dia, Semana e Mês.
+- No filtro de Mês, agora é possível alternar entre visão mensal detalhada e visão anual resumida.
+- Em telas mais largas, a interface passa a mostrar múltiplos calendários lado a lado para facilitar planejamento contínuo.
+- A lista global passou a agrupar resultados por mês quando você usa filtros amplos (Mês/Ano), melhorando a leitura.
+- O painel de calendário inicia aberto e com redimensionamento mais fluido.
+- Novo atalho `F1` para abrir a lista completa de atalhos disponíveis no aplicativo.
+- O atalho da tela “Sobre” foi ajustado para `Ctrl+Shift+A`.
+- A movimentação de tarefas ficou mais flexível, permitindo enviar itens também para listas concluídas com retorno claro de sucesso ou falha.
+- As listas de tarefas concluídas agora seguem a cor visual de cada quadrante, facilitando identificação rápida.
+- Ao trocar o idioma, o aplicativo agora confirma claramente quando a alteração foi aplicada.
+
+Correções e ajustes:
+- Sincronização reforçada entre calendário, contadores e lista global, inclusive nas visões múltiplas.
+- Atualização visual de destaques e contagens mais consistente ao navegar entre meses e anos.
+- Melhor estabilidade ao abrir, recolher e redimensionar o painel de calendário.
+- Salvamento de tarefas mais robusto, com identificação única para reduzir risco de inconsistências.
+- Compatibilidade automática com dados antigos, sem necessidade de ajuste manual.
+- Preservação mais confiável de prioridade, descrição e vínculo de tarefa durante carregamento e salvamento.
+
+Observações:
+- Seus dados existentes continuam compatíveis e são mantidos automaticamente.
+- Nenhuma ação manual é necessária para usar as melhorias desta versão.
+
+______________________________
+
 NOTAS DE LANÇAMENTO: Versão 0.1.9.0
 Data: 9 de fevereiro de 2026
 

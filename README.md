@@ -10,14 +10,14 @@
 
 ## <a id="ptbr"></a>🇧🇷 Português (BR)
 
-> **Observação:** Este repositório refere-se à versão **v0.1.9.0** do Projeto EISENHOWER ORGANIZER. Apoie o projeto e adquira a versão paga através do link: [Instalar via Microsoft Store](https://apps.microsoft.com/detail/9P289X0185C3)
+> **Observação:** Este repositório refere-se à versão **v0.2.0.0** do Projeto EISENHOWER ORGANIZER. Apoie o projeto e adquira a versão paga através do link: [Instalar via Microsoft Store](https://apps.microsoft.com/detail/9P289X0185C3)
 
 <details>
 <summary>Clique para expandir o README em português</summary>
 
 # EISENHOWER ORGANIZER — Organizador de Tarefas pela Matriz de Eisenhower
 
-Versão: v0.1.9.0  
+Versão: v0.2.0.0
 Autor: Fernando Nillsson Cidade
 
 ## Resumo
@@ -115,14 +115,14 @@ EISENHOWER ORGANIZER é um aplicativo leve para gerenciar tarefas usando a Matri
 
 ## <a id="enus"></a>🇺🇸 English (US)
 
-> **Note:** This repository refers to the **v0.1.9.0** version of the EISENHOWER ORGANIZER Project. Support the project and purchase the paid version through the link: [Install via Microsoft Store](https://apps.microsoft.com/detail/9P289X0185C3)
+> **Note:** This repository refers to the **v0.2.0.0** version of the EISENHOWER ORGANIZER Project. Support the project and purchase the paid version through the link: [Install via Microsoft Store](https://apps.microsoft.com/detail/9P289X0185C3)
 
 <details>
 <summary>Click to expand the README in English</summary>
 
 # EISENHOWER ORGANIZER — Task Organizer using the Eisenhower Matrix
 
-Version: v0.1.9.0  
+Version: v0.2.0.0
 Author: Fernando Nillsson Cidade
 
 ## Summary

@@ -11,8 +11,10 @@ def get_text(text):
 def _emoji_from_priority(prio) -> str:
     try:
         label = prioridade_para_texto(prio, None)
+
         if label:
             emoji = str(label).strip()[:1]
+
             if emoji in {"🔴", "🟠", "🟡", "🟢"}:
                 return emoji
 
@@ -46,16 +48,20 @@ def _tasks_for_date(owner, qdate: QDate) -> list[dict]:
 
 def _on_calendar_context_menu(self, pos):
     try:
+        calendar_widget = getattr(self, "_context_calendar", None)
+
+        if calendar_widget is None:
+            calendar_widget = self.calendar
+
         qd = None
 
-        if hasattr(self.calendar, "_date_at_pos"):
-            qd = self.calendar._date_at_pos(pos)
+        if hasattr(calendar_widget, "_date_at_pos"):
+            qd = calendar_widget._date_at_pos(pos)
 
         if qd is None or not qd.isValid():
             return
 
         tasks = _tasks_for_date(self, qd)
-
         show_priority = True
 
         try:
@@ -64,7 +70,7 @@ def _on_calendar_context_menu(self, pos):
         except Exception:
             show_priority = True
 
-        menu = QMenu(self.calendar)
+        menu = QMenu(calendar_widget)
         edit_menu = menu.addMenu(get_text("✏️ Editar Tarefa") or "✏️ Editar Tarefa")
         remove_menu = menu.addMenu(get_text("🗑️ Remover Tarefa") or "🗑️ Remover Tarefa")
 
@@ -156,12 +162,14 @@ def _on_calendar_context_menu(self, pos):
                             get_text("🗑️ Remover Tarefa"),
                             get_text("Tarefa(s) removida(s) com sucesso.") or "Tarefa(s) removida(s) com sucesso.",
                         )
+
                     elif removed_count > 0:
                         QMessageBox.warning(
                             self,
                             get_text("🗑️ Remover Tarefa"),
                             get_text("Algumas tarefas nao puderam ser removidas.") or "Algumas tarefas nao puderam ser removidas.",
                         )
+
                     else:
                         QMessageBox.warning(
                             self,
@@ -174,7 +182,7 @@ def _on_calendar_context_menu(self, pos):
 
             act_remove_all.triggered.connect(_remove_all_tasks)
 
-        menu.exec(self.calendar.mapToGlobal(pos))
+        menu.exec(calendar_widget.mapToGlobal(pos))
 
     except Exception as e:
         logger.error(f"Erro ao abrir menu de contexto do calendário: {e}", exc_info=True)

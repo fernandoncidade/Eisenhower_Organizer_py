@@ -2,6 +2,7 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 from PySide6.QtCore import Qt
 import os
+import uuid
 from source.utils.LogManager import LogManager
 logger = LogManager.get_logger()
 
@@ -9,24 +10,16 @@ def get_text(text):
     return QCoreApplication.translate("InterfaceGrafica", text)
 
 def salvar_como(self):
-    path, filt = QFileDialog.getSaveFileName(self.app, self.get_text("Salvar"), os.path.expanduser("~"), "JSON (*.json);;Excel (*.xlsx);;PDF (*.pdf)")
+    default_name = os.path.basename(getattr(self.app, "tasks_path", "") or "eisenhower_tarefas.json")
+    default_path = os.path.join(os.path.expanduser("~"), default_name)
+    path, filt = QFileDialog.getSaveFileName(
+        self.app,
+        self.get_text("Salvar"),
+        default_path,
+        "JSON (*.json);;Excel (*.xlsx);;PDF (*.pdf)",
+    )
     if not path:
         return
-
-    def _qenum_to_int(v):
-        try:
-            return int(v)
-
-        except Exception:
-            try:
-                return int(getattr(v, "value"))
-
-            except Exception:
-                try:
-                    return int(v.value())
-
-                except Exception:
-                    return None
 
     ext = os.path.splitext(path)[1].lower()
     if ext == ".xlsx":
@@ -275,46 +268,74 @@ def salvar_como(self):
         try:
             import json as _json
 
-            def list_to_full_entries(lst):
+            def _normalize_priority(value):
+                try:
+                    if value is None or value == "":
+                        return None
+
+                    return int(value)
+
+                except Exception:
+                    return None
+
+            def list_to_entries(lst):
                 entries = []
+
                 for i in range(lst.count()):
                     item = lst.item(i)
+
                     if item and (item.flags() & Qt.ItemIsSelectable):
                         data = item.data(Qt.UserRole) or {}
+
+                        if not isinstance(data, dict):
+                            data = {}
+
+                        task_id = (data.get("id") or "").strip()
+
+                        if not task_id:
+                            task_id = str(uuid.uuid4())
+                            data["id"] = task_id
+                            item.setData(Qt.UserRole, data)
+
                         entry = {
-                            "display_text": item.text(),
+                            "id": task_id,
                             "text": data.get("text", item.text()),
                             "date": data.get("date"),
                             "time": data.get("time"),
-                            "check_state": _qenum_to_int(item.checkState()),
-                            "flags": _qenum_to_int(item.flags()),
-                            "priority": data.get("priority"),
-                            "description": data.get("description"),
-                            "file_path": data.get("file_path"),
-                            "tooltip": item.toolTip(),
-                            "raw_data": data,
                         }
+
+                        file_path = data.get("file_path")
+
+                        if file_path:
+                            entry["file_path"] = file_path
+
+                        description = data.get("description")
+
+                        if description:
+                            entry["description"] = description
+
+                        priority = _normalize_priority(data.get("priority"))
+
+                        if priority is not None:
+                            entry["priority"] = priority
+
                         entries.append(entry)
 
                 return entries
 
-            full = {
-                "meta": {
-                    "date_display_format": getattr(self.app, "date_input", None).displayFormat() if hasattr(self.app, "date_input") and self.app.date_input is not None else None,
-                    "language": getattr(getattr(self.app, "gerenciador_traducao", None), "obter_idioma_atual", lambda: None)(),
-                },
-                "quadrant1": list_to_full_entries(self.app.quadrant1_list),
-                "quadrant1_completed": list_to_full_entries(self.app.quadrant1_completed_list),
-                "quadrant2": list_to_full_entries(self.app.quadrant2_list),
-                "quadrant2_completed": list_to_full_entries(self.app.quadrant2_completed_list),
-                "quadrant3": list_to_full_entries(self.app.quadrant3_list),
-                "quadrant3_completed": list_to_full_entries(self.app.quadrant3_completed_list),
-                "quadrant4": list_to_full_entries(self.app.quadrant4_list),
-                "quadrant4_completed": list_to_full_entries(self.app.quadrant4_completed_list),
+            payload = {
+                "quadrant1": list_to_entries(self.app.quadrant1_list),
+                "quadrant1_completed": list_to_entries(self.app.quadrant1_completed_list),
+                "quadrant2": list_to_entries(self.app.quadrant2_list),
+                "quadrant2_completed": list_to_entries(self.app.quadrant2_completed_list),
+                "quadrant3": list_to_entries(self.app.quadrant3_list),
+                "quadrant3_completed": list_to_entries(self.app.quadrant3_completed_list),
+                "quadrant4": list_to_entries(self.app.quadrant4_list),
+                "quadrant4_completed": list_to_entries(self.app.quadrant4_completed_list),
             }
 
             with open(path, "w", encoding="utf-8") as f:
-                _json.dump(full, f, ensure_ascii=False, indent=2)
+                _json.dump(payload, f, ensure_ascii=False, indent=2)
 
             QMessageBox.information(self.app, self.get_text("Salvar"), self.get_text("Arquivo salvo com sucesso."))
 

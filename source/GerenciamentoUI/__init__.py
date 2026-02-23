@@ -13,6 +13,7 @@ from .ui_12_CalendarDialog import CalendarDialog
 from .ui_13_RotatedTabButton import RotatedTabButton
 from .ui_14_CalendarPanel import CalendarPanel
 from .ui_15_edit_task import edit_task_datetime, move_task_to_quadrant
+from .ui_16_YearCalendarWidget import YearCalendarWidget
 
 __all__ = [
     "SobreDialog",
@@ -30,5 +31,6 @@ __all__ = [
     "RotatedTabButton",
     "CalendarPanel",
     "edit_task_datetime",
-    "move_task_to_quadrant"
+    "move_task_to_quadrant",
+    "YearCalendarWidget",
 ]

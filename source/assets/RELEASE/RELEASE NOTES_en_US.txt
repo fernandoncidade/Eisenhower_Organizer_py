@@ -1,3 +1,33 @@
+RELEASE NOTES: Version 0.2.0.0
+Date: February 22, 2026
+
+Main highlights:
+- New integrated yearly calendar, with a 12-month view and task counts per month.
+- New Year filter in the global list, in addition to the Day, Week, and Month filters.
+- In the Month filter, it is now possible to switch between detailed monthly view and summarized yearly view.
+- On wider screens, the interface now shows multiple calendars side by side to support continuous planning.
+- The global list now groups results by month when you use broad filters (Month/Year), improving readability.
+- The calendar panel now starts expanded and with smoother resizing.
+- New `F1` shortcut to open the complete list of shortcuts available in the app.
+- The “About” screen shortcut has been changed to `Ctrl+Shift+A`.
+- Task movement is now more flexible, allowing items to also be sent to completed lists with clear success or failure feedback.
+- Completed task lists now follow each quadrant’s visual color, making quick identification easier.
+- When changing the language, the app now clearly confirms when the change has been applied.
+
+Fixes and adjustments:
+- Strengthened synchronization between calendar, counters, and global list, including in multiple views.
+- More consistent visual updates for highlights and counts when navigating across months and years.
+- Better stability when opening, collapsing, and resizing the calendar panel.
+- More robust task saving, with unique identification to reduce inconsistency risks.
+- Automatic compatibility with older data, with no manual adjustment required.
+- More reliable preservation of priority, description, and task linking during loading and saving.
+
+Notes:
+- Your existing data remains compatible and is preserved automatically.
+- No manual action is required to use this version’s improvements.
+
+______________________________
+
 RELEASE NOTES: Version 0.1.9.0
 Date: February 9, 2026
 

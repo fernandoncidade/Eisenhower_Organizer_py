@@ -5,6 +5,7 @@ logger = LogManager.get_logger()
 def _apply_locale_to_calendar(self):
     try:
         idioma = None
+
         if hasattr(self.app, "gerenciador_traducao"):
             idioma = self.app.gerenciador_traducao.obter_idioma_atual()
 
@@ -17,8 +18,11 @@ def _apply_locale_to_calendar(self):
         else:
             locale = QLocale.system()
 
-        self.calendar.setLocale(locale)
-        self.calendar.setFirstDayOfWeek(Qt.Sunday)
+        calendars = self._iter_calendars() if hasattr(self, "_iter_calendars") else [self.calendar]
+
+        for cal in calendars:
+            cal.setLocale(locale)
+            cal.setFirstDayOfWeek(Qt.Sunday)
 
     except Exception as e:
         logger.error(f"Erro ao aplicar localidade no calendário: {e}", exc_info=True)

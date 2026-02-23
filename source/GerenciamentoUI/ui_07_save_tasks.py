@@ -1,23 +1,53 @@
 import json
+import uuid
 from PySide6.QtCore import Qt
 from source.utils.LogManager import LogManager
 logger = LogManager.get_logger()
 
 def save_tasks(app):
     try:
+        def _normalize_priority(value):
+            try:
+                if value is None or value == "":
+                    return None
+
+                return int(value)
+
+            except Exception:
+                return None
+
         def list_to_entries(lst):
             entries = []
+
             for i in range(lst.count()):
                 item = lst.item(i)
+
                 if item.flags() & Qt.ItemIsSelectable:
                     data = item.data(Qt.UserRole) or {}
+
+                    if not isinstance(data, dict):
+                        data = {}
+
+                    task_id = (data.get("id") or "").strip()
+
+                    if not task_id:
+                        task_id = str(uuid.uuid4())
+                        data["id"] = task_id
+                        item.setData(Qt.UserRole, data)
+
                     text = data.get("text", item.text())
                     date = data.get("date")
                     time = data.get("time")
-                    entry = {"text": text, "date": date, "time": time}
+                    entry = {
+                        "id": task_id,
+                        "text": text,
+                        "date": date,
+                        "time": time,
+                    }
 
                     try:
                         file_path = data.get("file_path")
+
                         if file_path:
                             entry["file_path"] = file_path
 
@@ -26,6 +56,7 @@ def save_tasks(app):
 
                     try:
                         description = data.get("description")
+
                         if description:
                             entry["description"] = description
 
@@ -33,7 +64,8 @@ def save_tasks(app):
                         pass
 
                     try:
-                        priority = data.get("priority")
+                        priority = _normalize_priority(data.get("priority"))
+
                         if priority is not None:
                             entry["priority"] = priority
 

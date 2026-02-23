@@ -17,10 +17,13 @@ def load_tasks(app):
             def create_item(text, date_value, time_value, completed):
                 display_text = text
                 tooltip_lines = []
+
                 if date_value:
                     qdate = QDate.fromString(date_value, Qt.ISODate)
+
                     if qdate.isValid():
                         date_human = qdate.toString(date_format)
+
                         if time_value:
                             display_text = f"{text} — {date_human} {time_value}"
 
@@ -37,6 +40,7 @@ def load_tasks(app):
                 item.setCheckState(Qt.Checked if completed else Qt.Unchecked)
                 data = {"text": text, "date": date_value, "time": time_value}
                 item.setData(Qt.UserRole, data)
+
                 if tooltip_lines:
                     item.setToolTip("\n".join(tooltip_lines))
 
@@ -45,47 +49,64 @@ def load_tasks(app):
             def populate_list(key, lst, completed=False):
                 if key in tasks and tasks[key]:
                     lst.clear()
+
                     for entry in tasks[key]:
                         if isinstance(entry, dict):
                             text = entry.get("text", "")
                             date_value = entry.get("date")
                             time_value = entry.get("time")
+                            task_id = entry.get("id")
+                            priority_value = entry.get("priority")
 
                         else:
                             text = str(entry)
                             date_value = None
                             time_value = None
+                            task_id = None
+                            priority_value = None
 
                         text = text.strip()
+
                         if not text:
                             continue
 
                         item = create_item(text, date_value, time_value, completed)
 
                         try:
-                            if lst in (app.quadrant1_list, app.quadrant1_completed_list):
-                                pr = 1
+                            data = item.data(Qt.UserRole) or {}
 
-                            elif lst in (app.quadrant2_list, app.quadrant2_completed_list):
-                                pr = 2
+                            if not isinstance(data, dict):
+                                data = {}
 
-                            elif lst in (app.quadrant3_list, app.quadrant3_completed_list):
-                                pr = 3
+                            if task_id:
+                                data["id"] = str(task_id)
 
-                            elif lst in (app.quadrant4_list, app.quadrant4_completed_list):
-                                pr = 4
+                            pr = None
 
-                            else:
+                            try:
+                                if priority_value is not None and priority_value != "":
+                                    pr = int(priority_value)
+
+                            except Exception:
                                 pr = None
 
-                            if pr is not None:
-                                try:
-                                    data = item.data(Qt.UserRole) or {}
-                                    data["priority"] = pr
-                                    item.setData(Qt.UserRole, data)
+                            if pr is None:
+                                if lst in (app.quadrant1_list, app.quadrant1_completed_list):
+                                    pr = 1
 
-                                except Exception:
-                                    pass
+                                elif lst in (app.quadrant2_list, app.quadrant2_completed_list):
+                                    pr = 2
+
+                                elif lst in (app.quadrant3_list, app.quadrant3_completed_list):
+                                    pr = 3
+
+                                elif lst in (app.quadrant4_list, app.quadrant4_completed_list):
+                                    pr = 4
+
+                            if pr is not None:
+                                data["priority"] = pr
+
+                            item.setData(Qt.UserRole, data)
 
                         except Exception:
                             pass
@@ -96,6 +117,7 @@ def load_tasks(app):
                                 data["file_path"] = entry.get("file_path")
                                 item.setData(Qt.UserRole, data)
                                 tt = item.toolTip() or ""
+
                                 if tt:
                                     tt = tt + "\n"
 
@@ -122,12 +144,14 @@ def load_tasks(app):
 
                                 try:
                                     tt = item.toolTip() or ""
+
                                     if tt:
                                         tt = tt + "\n"
 
                                     desc_full = entry.get("description") or ""
                                     preview_lines = [ln for ln in desc_full.splitlines() if ln.strip()]
                                     preview = "\n".join(preview_lines[:3])
+
                                     if preview:
                                         tt = tt + (get_text("Descrição") or "Descrição") + ":\n" + preview
 

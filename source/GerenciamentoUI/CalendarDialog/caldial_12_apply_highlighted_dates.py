@@ -6,16 +6,23 @@ logger = LogManager.get_logger()
 def _apply_highlighted_dates(self):
     try:
         new_dates = self._get_task_dates()
+
         if not hasattr(self, "_highlighted_dates"):
             self._highlighted_dates = set()
 
+        calendars = self._iter_calendars() if hasattr(self, "_iter_calendars") else [self.calendar]
+
         to_clear = self._highlighted_dates - new_dates
+
         if to_clear:
             blank = QTextCharFormat()
+
             for ds in to_clear:
                 qd = QDate.fromString(ds, Qt.ISODate)
+
                 if qd.isValid():
-                    self.calendar.setDateTextFormat(qd, blank)
+                    for cal in calendars:
+                        cal.setDateTextFormat(qd, blank)
 
         fmt = QTextCharFormat()
         pal = self.palette()
@@ -26,8 +33,10 @@ def _apply_highlighted_dates(self):
 
         for ds in new_dates:
             qd = QDate.fromString(ds, Qt.ISODate)
+
             if qd.isValid():
-                self.calendar.setDateTextFormat(qd, fmt)
+                for cal in calendars:
+                    cal.setDateTextFormat(qd, fmt)
 
         self._highlighted_dates = new_dates
 

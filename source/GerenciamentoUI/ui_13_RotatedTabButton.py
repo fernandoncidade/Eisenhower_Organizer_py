@@ -10,6 +10,7 @@ class RotatedTabButton(QWidget):
         super().__init__(parent)
         try:
             self._text = text
+            self._click_handler = None
             self.setMinimumWidth(25)
             self._recompute_size()
 
@@ -44,9 +45,21 @@ class RotatedTabButton(QWidget):
         except Exception as e:
             logger.error(f"Erro ao recalcular tamanho do botão de aba: {e}", exc_info=True)
 
+    def setClickHandler(self, handler):
+        try:
+            self._click_handler = handler
+
+        except Exception as e:
+            logger.error(f"Erro ao definir handler de clique do botão de aba: {e}", exc_info=True)
+
     def mousePressEvent(self, event):
         try:
-            self.parent().toggle_panel()
+            if callable(self._click_handler):
+                self._click_handler()
+
+            elif hasattr(self.parent(), "toggle_panel"):
+                self.parent().toggle_panel()
+
             super().mousePressEvent(event)
 
         except Exception as e:

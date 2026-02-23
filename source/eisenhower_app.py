@@ -1,6 +1,7 @@
 import os
+import shutil
 from PySide6.QtCore import QCoreApplication, Qt, QTimer, QEvent
-from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, QComboBox
+from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QPushButton, QComboBox, QSplitter
 from PySide6.QtGui import QFont, QColor, QPalette
 from source.utils.IconUtils import get_icon_path
 from source.utils.CaminhoPersistenteUtils import obter_caminho_persistente
@@ -38,6 +39,9 @@ def get_text(text):
 class EisenhowerMatrixApp(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.calendar_start_expanded = True  # Exibe o painel de calendário já aberto ao iniciar.
+        self.calendar_min_width = 400   # Ajuste este valor para definir a largura minima do painel de calendario.
+        self.quadrants_min_width = 400  # Ajuste este valor para definir a largura minima da area dos quadrantes.
         self.gerenciador_traducao = GerenciadorTraducao()
         self.gerenciador_traducao.idioma_alterado.connect(self.atualizar_textos)
         self.gerenciador_traducao.aplicar_traducao()
@@ -53,9 +57,18 @@ class EisenhowerMatrixApp(QMainWindow):
             from PySide6.QtGui import QIcon
             self.setWindowIcon(QIcon(icon_path))
 
-        self.tasks_path = os.path.join(obter_caminho_persistente(), "tasks.json")
-        self.arquivo = Arquivo(self)
+        persistent_dir = obter_caminho_persistente()
+        self.tasks_path = os.path.join(persistent_dir, "eisenhower_tarefas.json")
+        legacy_tasks_path = os.path.join(persistent_dir, "tasks.json")
 
+        try:
+            if (not os.path.exists(self.tasks_path)) and os.path.exists(legacy_tasks_path):
+                shutil.copy2(legacy_tasks_path, self.tasks_path)
+
+        except Exception as e:
+            logger.error(f"Erro ao migrar arquivo legado de tarefas: {e}", exc_info=True)
+
+        self.arquivo = Arquivo(self)
         self.initUI()
 
         try:
@@ -111,9 +124,37 @@ class EisenhowerMatrixApp(QMainWindow):
             layout.setContentsMargins(0, 0, 0, 0)
             layout.setSpacing(0)
 
+            self.main_splitter = QSplitter(Qt.Horizontal, container)
+            self.main_splitter.setChildrenCollapsible(False)
+            self.main_splitter.setHandleWidth(8)
+
             self.calendar_pane = Calendar(self)
-            layout.addWidget(self.calendar_pane, 0, Qt.AlignLeft)
-            layout.addWidget(old_central, 1)
+            old_central.setMinimumWidth(max(120, int(getattr(self, "quadrants_min_width", 180))))
+            self.main_splitter.addWidget(self.calendar_pane)
+            self.main_splitter.addWidget(old_central)
+            self.main_splitter.setStretchFactor(0, 0)
+            self.main_splitter.setStretchFactor(1, 1)
+            layout.addWidget(self.main_splitter, 1)
+
+            try:
+                configured_panel_w = max(220, int(getattr(self, "calendar_min_width", 400)))
+
+                try:
+                    self.calendar_pane._panel_width = configured_panel_w
+                    self.calendar_pane.calendar_panel.set_calendar_content_width(configured_panel_w)
+                    self.calendar_pane.setMinimumWidth(self.calendar_pane.effective_min_width())
+
+                except Exception:
+                    pass
+
+                calendar_w = max(25, int(self.calendar_pane.effective_min_width()))
+                total_w = max(self.width(), 800)
+                quadrants_min_w = max(120, int(getattr(self, "quadrants_min_width", 180)))
+                quadrant_w = max(quadrants_min_w, total_w - calendar_w)
+                self.main_splitter.setSizes([calendar_w, quadrant_w])
+
+            except Exception:
+                pass
 
             self.setCentralWidget(container)
             self._main_content = old_central
@@ -611,9 +652,36 @@ class EisenhowerMatrixApp(QMainWindow):
         try:
             if hasattr(self, "calendar_pane") and self.calendar_pane:
                 self.calendar_pane.toggle_panel(open_if_hidden=True)
+                self._sync_splitter_for_calendar()
 
         except Exception as e:
             logger.error(f"Erro ao abrir calendário: {e}", exc_info=True)
+
+    def _sync_splitter_for_calendar(self):
+        try:
+            splitter = getattr(self, "main_splitter", None)
+
+            if splitter is None:
+                return
+
+            sizes = splitter.sizes()
+
+            if len(sizes) < 2:
+                return
+
+            calendar_w = max(
+                25,
+                self.calendar_pane.minimumWidth(),
+                self.calendar_pane.width(),
+                self.calendar_pane.sizeHint().width(),
+            )
+            total_w = sum(sizes) if sum(sizes) > 0 else max(self.width(), 400)
+            quadrants_min_w = max(120, int(getattr(self, "quadrants_min_width", 180)))
+            quadrant_w = max(quadrants_min_w, total_w - calendar_w)
+            splitter.setSizes([calendar_w, quadrant_w])
+
+        except Exception:
+            pass
 
     def nova_sessao(self):
         self.arquivo.novo()

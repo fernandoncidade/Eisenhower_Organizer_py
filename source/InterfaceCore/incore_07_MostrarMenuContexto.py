@@ -41,12 +41,12 @@ class MostrarMenuContexto:
         return _mmc_is_completed_list(app, lst)
 
     @staticmethod
-    def _quadrant_options(app):
-        return _mmc_quadrant_options(app)
+    def _quadrant_options(app, include_completed: bool = False):
+        return _mmc_quadrant_options(app, include_completed)
 
     @staticmethod
-    def _target_list_for_quadrant(app, quadrant_index: int, keep_completed: bool):
-        return _mmc_target_list_for_quadrant(app, quadrant_index, keep_completed)
+    def _target_list_for_quadrant(app, quadrant_index: int, keep_completed: bool, include_completed: bool = False):
+        return _mmc_target_list_for_quadrant(app, quadrant_index, keep_completed, include_completed)
 
     @staticmethod
     def _find_source_item_for_calendar(app, task_dict):

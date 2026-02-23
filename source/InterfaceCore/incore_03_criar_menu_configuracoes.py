@@ -1,4 +1,5 @@
-from PySide6.QtWidgets import QMenu
+from html import escape as _html_escape
+from PySide6.QtWidgets import QMenu, QMessageBox
 from PySide6.QtGui import QAction, QKeySequence, QShortcut
 from PySide6.QtCore import QCoreApplication, Qt
 from source.utils.LogManager import LogManager
@@ -11,8 +12,148 @@ def get_text(text):
 def criar_menu_configuracoes(app):
     try:
         mb = app.menuBar()
+
         for act in list(mb.actions()):
             mb.removeAction(act)
+
+        def _clean_label(text: str | None) -> str:
+            return (text or "").replace("&", "").strip()
+
+        def _seq_to_text(seq) -> str:
+            if seq is None:
+                return ""
+
+            try:
+                s = seq.toString(QKeySequence.NativeText)
+
+                if s:
+                    return s
+
+            except Exception:
+                pass
+
+            try:
+                return seq.toString()
+
+            except Exception:
+                return ""
+
+        def _collect_menu_shortcuts(menu: QMenu, menu_path: str = ""):
+            entries = []
+            menu_title = _clean_label(menu.title())
+            current_path = f"{menu_path} -> {menu_title}" if menu_path and menu_title else (menu_title or menu_path)
+
+            for action in menu.actions():
+                submenu = action.menu()
+
+                if submenu is not None:
+                    entries.extend(_collect_menu_shortcuts(submenu, current_path))
+                    continue
+
+                key_text = _seq_to_text(action.shortcut())
+
+                if not key_text:
+                    continue
+
+                action_text = _clean_label(action.text()) or get_text("Ação")
+                location = f"{current_path} -> {action_text}" if current_path else action_text
+                entries.append((key_text, location))
+
+            return entries
+
+        def _show_shortcuts_dialog():
+            try:
+                menu_entries = []
+                global_entries = []
+                seen = set()
+
+                for menu_action in app.menuBar().actions():
+                    menu = menu_action.menu()
+
+                    if menu is None:
+                        continue
+
+                    for key_text, location in _collect_menu_shortcuts(menu):
+                        k = (key_text, location)
+
+                        if k in seen:
+                            continue
+
+                        seen.add(k)
+                        menu_entries.append((key_text, location))
+
+                for attr, label in (
+                    ("atalho_arquivo", get_text("Abrir menu Arquivo")),
+                    ("atalho_idioma", get_text("Abrir menu Idioma")),
+                    ("atalho_opcoes", get_text("Abrir menu Opções")),
+                ):
+                    sc = getattr(app, attr, None)
+
+                    if sc is None:
+                        continue
+
+                    key_text = _seq_to_text(sc.key())
+
+                    if not key_text:
+                        continue
+
+                    k = (key_text, label)
+
+                    if k in seen:
+                        continue
+
+                    seen.add(k)
+                    global_entries.append((key_text, label))
+
+                def _build_rows(entries, empty_text: str) -> str:
+                    if not entries:
+                        return (
+                            "<tr>"
+                            f"<td colspan='2'><i>{_html_escape(empty_text)}</i></td>"
+                            "</tr>"
+                        )
+
+                    rows = []
+                    for key_text, desc in entries:
+                        rows.append(
+                            "<tr>"
+                            f"<td><b>{_html_escape(key_text)}</b></td>"
+                            f"<td>{_html_escape(desc)}</td>"
+                            "</tr>"
+                        )
+
+                    return "".join(rows)
+
+                menu_rows = _build_rows(menu_entries, get_text("Nenhum atalho de menu encontrado."))
+                global_rows = _build_rows(global_entries, get_text("Nenhum atalho global encontrado."))
+
+                title = get_text("Atalhos de Teclado")
+                menu_title = get_text("Atalhos de menu")
+                global_title = get_text("Atalhos globais")
+                col_shortcut = get_text("Atalho")
+                col_action = get_text("Ação")
+                intro = get_text("Lista completa de atalhos implementados no código:")
+
+                help_html = (
+                    f"<h2>{_html_escape(title)}</h2>"
+                    f"<p>{_html_escape(intro)}</p>"
+                    f"<p><b>{_html_escape(menu_title)}</b></p>"
+                    f"<table border='0' cellspacing='0' cellpadding='3'>"
+                    f"<tr><td><b>{_html_escape(col_shortcut)}</b></td><td><b>{_html_escape(col_action)}</b></td></tr>"
+                    f"{menu_rows}"
+                    "</table>"
+                    "<br>"
+                    f"<p><b>{_html_escape(global_title)}</b></p>"
+                    f"<table border='0' cellspacing='0' cellpadding='3'>"
+                    f"<tr><td><b>{_html_escape(col_shortcut)}</b></td><td><b>{_html_escape(col_action)}</b></td></tr>"
+                    f"{global_rows}"
+                    "</table>"
+                )
+
+                QMessageBox.information(app, get_text("Ajuda - Atalhos"), help_html,)
+
+            except Exception as e:
+                logger.error(f"Erro ao exibir diálogo de atalhos: {e}", exc_info=True)
 
         # ARQUIVO MENU
         arquivo_menu = QMenu(get_text("Arquivo"), app)
@@ -62,6 +203,19 @@ def criar_menu_configuracoes(app):
 
         acao_limpar.triggered.connect(app.limpar_tudo)
         arquivo_menu.addAction(acao_limpar)
+
+        # ATALHOS MENU
+        acao_atalhos = QAction(get_text("Atalhos"), app)
+
+        try:
+            acao_atalhos.setShortcut(QKeySequence("F1"))
+            acao_atalhos.setShortcutContext(Qt.ApplicationShortcut)
+
+        except Exception:
+            pass
+
+        acao_atalhos.triggered.connect(_show_shortcuts_dialog)
+        arquivo_menu.addAction(acao_atalhos)
 
         # SAIR MENU
         arquivo_menu.addSeparator()
@@ -171,14 +325,11 @@ def criar_menu_configuracoes(app):
         acao_sobre = QAction(get_text("Sobre"), app)
 
         try:
-            acao_sobre.setShortcut(QKeySequence.HelpContents)
+            acao_sobre.setShortcut(QKeySequence("Ctrl+Shift+A"))
+            acao_sobre.setShortcutContext(Qt.ApplicationShortcut)
 
         except Exception:
-            try:
-                acao_sobre.setShortcut(QKeySequence("F1"))
-
-            except Exception:
-                pass
+            pass
 
         acao_sobre.triggered.connect(app.exibir_sobre)
         opcoes_menu.addAction(acao_sobre)
